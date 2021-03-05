@@ -24,6 +24,14 @@ func verifySignature(signature string, id string, timestamp string, body []byte)
 	return signature == sha
 }
 
+func handleEvent(pool *websocket.Pool, event twitch.Event) {
+	if event.Reward.Title == "Hydrate" {
+		log.Println("Hydrate redeemed")
+		message := websocket.Message{Event: "hydrate"}
+		pool.Broadcast <- message
+	}
+}
+
 func handleWs(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -85,11 +93,7 @@ func handleNotifcation(pool *websocket.Pool, w http.ResponseWriter, r *http.Requ
 			log.Fatal("Error parsing challenge json", err)
 		}
 
-		if notification.Event.Reward.Title == "Hydrate" {
-			log.Println("Hydrate redeemed")
-			message := websocket.Message{Event: "hydrate"}
-			pool.Broadcast <- message
-		}
+		handleEvent(pool, notification.Event)
 
 		w.Write([]byte(""))
 	}
