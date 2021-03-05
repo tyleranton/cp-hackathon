@@ -85,7 +85,7 @@ func CreateChannelPointsSubscription(broadcasterID string, secret string, client
 	postBody, err := json.Marshal(subscription)
 
 	if err != nil {
-		log.Println("Failed to marshal subscription payload", err)
+		log.Fatal("Failed to marshal subscription payload", err)
 	}
 
 	req, err := http.NewRequest("POST", BaseHelixURL+"eventsub/subscriptions", bytes.NewBuffer(postBody))
