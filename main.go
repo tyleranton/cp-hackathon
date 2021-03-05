@@ -111,9 +111,10 @@ func setupSubscription() {
 	token := twitch.GetAppAccessToken(os.Getenv("TWITCH_CLIENT_ID"), os.Getenv("TWITCH_CLIENT_SECRET"))
 	twitch.CreateChannelPointsSubscription(
 		os.Getenv("TWITCH_BROADCASTER_ID"),
-		os.Getenv("WH_SECRET"),
 		os.Getenv("TWITCH_CLIENT_ID"),
 		token,
+		os.Getenv("WH_SECRET"),
+		os.Getenv("WH_CALLBACK_URL"),
 	)
 
 }

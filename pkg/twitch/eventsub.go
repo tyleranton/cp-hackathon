@@ -68,7 +68,7 @@ type Notification struct {
 }
 
 // CreateChannelPointsSubscription creates a Twitch EventSub subscription for channel points
-func CreateChannelPointsSubscription(broadcasterID string, secret string, clientID string, token string) {
+func CreateChannelPointsSubscription(broadcasterID string, clientID string, token string, whSecret string, whCallbackURL string) {
 	subscription := Subscription{
 		Type:    "channel.channel_points_custom_reward_redemption.add",
 		Version: "1",
@@ -77,8 +77,8 @@ func CreateChannelPointsSubscription(broadcasterID string, secret string, client
 		},
 		Transport: Transport{
 			Method:   "webhook",
-			Callback: "https://592ebbe08d0c.ngrok.io/notification",
-			Secret:   secret,
+			Callback: whCallbackURL + "/notification",
+			Secret:   whSecret,
 		},
 	}
 
