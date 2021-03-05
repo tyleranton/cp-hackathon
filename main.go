@@ -27,7 +27,7 @@ func verifySignature(signature string, id string, timestamp string, body []byte)
 func handleEvent(pool *websocket.Pool, event twitch.Event) {
 	if event.Reward.Title == "Hydrate" {
 		log.Println("Hydrate redeemed")
-		message := websocket.Message{Event: "hydrate"}
+		message := websocket.BroadcastMessage{Event: "hydrate"}
 		pool.Broadcast <- message
 	}
 }
@@ -52,6 +52,8 @@ func handleWs(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
 	pool.Register <- client
 
 	log.Println("Client connected to websocket")
+
+	client.Read()
 }
 
 func handleNotifcation(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {

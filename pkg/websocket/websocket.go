@@ -13,23 +13,46 @@ type Client struct {
 	Pool *Pool
 }
 
-// Message represents a message to be broadcast
-type Message struct {
-	Event string `json:"event"`
-}
-
 // Pool represents a connection pool of connected clients
 type Pool struct {
 	Register   chan *Client
 	Unregister chan *Client
 	Clients    map[*Client]bool
-	Broadcast  chan Message
+	Broadcast  chan BroadcastMessage
+}
+
+// BroadcastMessage represents a message to be broadcast
+type BroadcastMessage struct {
+	Event string `json:"event"`
+}
+
+// ClientMessage repressents a message from a client
+type ClientMessage struct {
+	Type int    `json:"type"`
+	Body string `json:"body"`
 }
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin:     func(r *http.Request) bool { return true },
+}
+
+func (c *Client) Read() {
+	defer func() {
+		c.Pool.Unregister <- c
+		c.Conn.Close()
+	}()
+
+	for {
+		messageType, p, err := c.Conn.ReadMessage()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		message := ClientMessage{Type: messageType, Body: string(p)}
+		log.Println("Message Received:", message)
+	}
 }
 
 // Upgrade upgrades client connection to websocket
@@ -49,7 +72,7 @@ func NewPool() *Pool {
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    make(map[*Client]bool),
-		Broadcast:  make(chan Message),
+		Broadcast:  make(chan BroadcastMessage),
 	}
 }
 
