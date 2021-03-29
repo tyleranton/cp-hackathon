@@ -1,6 +1,6 @@
 # cp-hackathon
 
-My entry for the Twitch Channel Points Hackathon
+This is my entry for the Twitch Channel Points Hackathon (and also my first time using Go)
 
 # Getting Started
 
@@ -11,6 +11,8 @@ Required environment variables:
 - `TWITCH_BROADCASTER_ID`
 - `WH_CALLBACK_URL`
 - `WH_SECRET`
+
+You can include these environment variables locally by creating a `.env` file in the root of the project and placing them there.
 
 If running locally, it's recommended to use a tool like Ngrok to create an https tunnel for the webhook callback URL.
 
