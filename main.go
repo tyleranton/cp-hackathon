@@ -11,8 +11,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/cp-hackathon/pkg/twitch"
-	"github.com/cp-hackathon/pkg/websocket"
+	"github.com/cp-hackathon/twitch"
+	"github.com/cp-hackathon/websocket"
 	"github.com/joho/godotenv"
 )
 
@@ -65,7 +65,7 @@ func handleNotifcation(pool *websocket.Pool, w http.ResponseWriter, r *http.Requ
 	body, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
-		log.Fatal("Failed to parse request body", err)
+		log.Println("Failed to parse Notification request body", err)
 	}
 
 	if !verifySignature(
@@ -75,6 +75,7 @@ func handleNotifcation(pool *websocket.Pool, w http.ResponseWriter, r *http.Requ
 		body,
 	) {
 		http.Error(w, "Forbidden", http.StatusForbidden)
+		log.Println("Invalid notification signature")
 		return
 	}
 
@@ -82,7 +83,8 @@ func handleNotifcation(pool *websocket.Pool, w http.ResponseWriter, r *http.Requ
 		var challenge twitch.Challenge
 
 		if err := json.Unmarshal(body, &challenge); err != nil {
-			log.Fatal("Error parsing challenge json", err)
+			log.Println("Error parsing challenge json", err)
+			return
 		}
 
 		w.Write([]byte(challenge.Challenge))
@@ -92,12 +94,12 @@ func handleNotifcation(pool *websocket.Pool, w http.ResponseWriter, r *http.Requ
 		var notification twitch.Notification
 
 		if err := json.Unmarshal(body, &notification); err != nil {
-			log.Fatal("Error parsing challenge json", err)
+			log.Println("Error parsing challenge json", err)
+			return
 		}
 
+		w.WriteHeader(http.StatusNoContent)
 		handleEvent(pool, notification.Event)
-
-		w.Write([]byte(""))
 	}
 }
 

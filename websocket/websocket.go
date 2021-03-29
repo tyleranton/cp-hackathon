@@ -45,13 +45,11 @@ func (c *Client) Read() {
 	}()
 
 	for {
-		messageType, p, err := c.Conn.ReadMessage()
+		_, _, err := c.Conn.ReadMessage()
 		if err != nil {
-			log.Println(err)
+			log.Println("Client disconnected from websocket")
 			return
 		}
-		message := ClientMessage{Type: messageType, Body: string(p)}
-		log.Println("Message Received:", message)
 	}
 }
 
